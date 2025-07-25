@@ -1,0 +1,252 @@
+version: '3.3'
+
+services:
+  product-db:
+    image: postgres:latest
+    container_name: product-db
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USERNAME}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB_PRODUCT}
+      - PGDATA=/var/lib/postgresql/data/
+    volumes:
+      - postgresql_product_db_data:/var/lib/postgresql/data/
+      - ./dev/sql/:/var/lib/postgresql/sql
+    expose:
+      - ${POSTGRES_PORT_PRODUCT}
+    ports:
+      - ${POSTGRES_PORT_PRODUCT_EXT}:${POSTGRES_PORT_PRODUCT}
+
+  product:
+    container_name: product
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      context: ./product/
+    image:
+      ecommerce-microservices_product:latest
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+      - POSTGRES_DB=${POSTGRES_DB_PRODUCT}
+      - POSTGRES_HOST=${POSTGRES_HOST_PRODUCT}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_PORT=${POSTGRES_PORT_PRODUCT}
+      - POSTGRES_SCHEMA=${POSTGRES_SCHEMA}
+      - POSTGRES_USERNAME=${POSTGRES_USERNAME}
+      - SERVER_HOST=${PRODUCT_HOST}
+      - SERVER_PORT=${PRODUCT_PORT}
+      - SERVER_WORKERS=${PRODUCT_WORKERS}
+      - AUTHENTICATION_HOST=${AUTHENTICATION_HOST}
+      - AUTHENTICATION_PORT=${AUTHENTICATION_PORT}
+      - AUTHENTICATION_PORT_EXT=${AUTHENTICATION_PORT_EXT}
+      - AUTHENTICATION_ENDPOINT=${AUTHENTICATION_ENDPOINT}
+      - AUTHENTICATION_ROUTER=${AUTHENTICATION_ROUTER}
+      - DB_TIMEOUT=${DB_TIMEOUT}
+      - DB_POOL_SIZE=${DB_POOL_SIZE}
+      - DB_MAX_POOL_CON=${DB_MAX_POOL_CON}
+      - DB_POOL_OVERFLOW=${DB_POOL_OVERFLOW}
+      - IS_DB_ECHO_LOG=${IS_DB_ECHO_LOG}
+      - IS_DB_EXPIRE_ON_COMMIT=${IS_DB_EXPIRE_ON_COMMIT}
+      - IS_DB_FORCE_ROLLBACK=${IS_DB_FORCE_ROLLBACK}
+      - IS_ALLOWED_CREDENTIALS=${IS_ALLOWED_CREDENTIALS}
+      - API_TOKEN=${API_TOKEN}
+      - AUTH_TOKEN=${AUTH_TOKEN}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_ALGORITHM=${JWT_ALGORITHM}
+      - JWT_MIN=${JWT_MIN}
+      - JWT_HOUR=${JWT_HOUR}
+      - JWT_DAY=${JWT_DAY}
+    volumes:
+      - ./product/:/usr/product/
+    expose:
+      - ${PRODUCT_PORT}
+    ports:
+      - ${PRODUCT_PORT_EXT}:${PRODUCT_PORT}
+    depends_on:
+      - product-db
+
+  order-db:
+    image: postgres:latest
+    container_name: order-db
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USERNAME}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB_ORDER}
+      - PGDATA=/var/lib/postgresql/data/
+    volumes:
+      - postgresql_order_db_data:/var/lib/postgresql/data/
+      - ./dev/sql/:/var/lib/postgresql/sql
+    expose:
+      - ${POSTGRES_PORT_ORDER}
+    ports:
+      - ${POSTGRES_PORT_ORDER_EXT}:${POSTGRES_PORT_ORDER}
+    command: -p ${POSTGRES_PORT_ORDER}
+
+  order:
+    container_name: order
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      context: ./order/
+    image: ecommerce-microservices_order:latest
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+      - POSTGRES_DB=${POSTGRES_DB_ORDER}
+      - POSTGRES_HOST=${POSTGRES_HOST_ORDER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_PORT=${POSTGRES_PORT_ORDER}
+      - POSTGRES_SCHEMA=${POSTGRES_SCHEMA}
+      - POSTGRES_USERNAME=${POSTGRES_USERNAME}
+      - SERVER_HOST=${ORDER_HOST}
+      - SERVER_PORT=${ORDER_PORT}
+      - SERVER_WORKERS=${ORDER_WORKERS}
+      - PRODUCT_HOST=${PRODUCT_HOST}
+      - PRODUCT_PORT=${PRODUCT_PORT}
+      - AUTHENTICATION_HOST=${AUTHENTICATION_HOST}
+      - AUTHENTICATION_PORT=${AUTHENTICATION_PORT}
+      - AUTHENTICATION_PORT_EXT=${AUTHENTICATION_PORT_EXT}
+      - AUTHENTICATION_ENDPOINT=${AUTHENTICATION_ENDPOINT}
+      - AUTHENTICATION_ROUTER=${AUTHENTICATION_ROUTER}
+      - DB_TIMEOUT=${DB_TIMEOUT}
+      - DB_POOL_SIZE=${DB_POOL_SIZE}
+      - DB_MAX_POOL_CON=${DB_MAX_POOL_CON}
+      - DB_POOL_OVERFLOW=${DB_POOL_OVERFLOW}
+      - IS_DB_ECHO_LOG=${IS_DB_ECHO_LOG}
+      - IS_DB_EXPIRE_ON_COMMIT=${IS_DB_EXPIRE_ON_COMMIT}
+      - IS_DB_FORCE_ROLLBACK=${IS_DB_FORCE_ROLLBACK}
+      - IS_ALLOWED_CREDENTIALS=${IS_ALLOWED_CREDENTIALS}
+      - API_TOKEN=${API_TOKEN}
+      - AUTH_TOKEN=${AUTH_TOKEN}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_ALGORITHM=${JWT_ALGORITHM}
+      - JWT_MIN=${JWT_MIN}
+      - JWT_HOUR=${JWT_HOUR}
+      - JWT_DAY=${JWT_DAY}
+      - RABBITMQ_HOST=${RABBITMQ_HOST}
+      - RABBITMQ_PORT_AMQP=${RABBITMQ_PORT_AMQP}
+      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+      - REDIS_PORT=${REDIS_PORT}
+    volumes:
+      - ./order/:/usr/order/
+    expose:
+      - ${ORDER_PORT}
+    ports:
+      - ${ORDER_PORT_EXT}:${ORDER_PORT}
+    depends_on:
+      - order-db
+
+
+  account-db:
+    image: postgres:latest
+    container_name: account-db
+    restart: always
+    environment:
+      - POSTGRES_USER=${POSTGRES_USERNAME}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB_ACCOUNT}
+      - PGDATA=/var/lib/postgresql/data/
+    volumes:
+      - postgresql_account_db_data:/var/lib/postgresql/data/
+      - ./dev/sql/:/var/lib/postgresql/sql
+    expose:
+      - ${POSTGRES_PORT_ACCOUNT}
+    ports:
+      - ${POSTGRES_PORT_ACCOUNT_EXT}:${POSTGRES_PORT_ACCOUNT}
+    command: -p ${POSTGRES_PORT_ACCOUNT}
+
+  account:
+    container_name: account
+    restart: always
+    build:
+      dockerfile: Dockerfile
+      context: ./account/
+    image: ecommerce-microservices_account:latest
+    environment:
+      - ENVIRONMENT=${ENVIRONMENT}
+      - POSTGRES_DB=${POSTGRES_DB_ACCOUNT}
+      - POSTGRES_HOST=${POSTGRES_HOST_ACCOUNT}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_PORT=${POSTGRES_PORT_ACCOUNT}
+      - POSTGRES_SCHEMA=${POSTGRES_SCHEMA}
+      - POSTGRES_USERNAME=${POSTGRES_USERNAME}
+      - SERVER_HOST=${AUTHENTICATION_HOST}
+      - SERVER_PORT=${AUTHENTICATION_PORT}
+      - SERVER_WORKERS=${AUTHENTICATION_WORKERS}
+      - DB_TIMEOUT=${DB_TIMEOUT}
+      - DB_POOL_SIZE=${DB_POOL_SIZE}
+      - DB_MAX_POOL_CON=${DB_MAX_POOL_CON}
+      - DB_POOL_OVERFLOW=${DB_POOL_OVERFLOW}
+      - IS_DB_ECHO_LOG=${IS_DB_ECHO_LOG}
+      - IS_DB_EXPIRE_ON_COMMIT=${IS_DB_EXPIRE_ON_COMMIT}
+      - IS_DB_FORCE_ROLLBACK=${IS_DB_FORCE_ROLLBACK}
+      - IS_ALLOWED_CREDENTIALS=${IS_ALLOWED_CREDENTIALS}
+      - API_TOKEN=${API_TOKEN}
+      - AUTH_TOKEN=${AUTH_TOKEN}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_ALGORITHM=${JWT_ALGORITHM}
+      - JWT_MIN=${JWT_MIN}
+      - JWT_HOUR=${JWT_HOUR}
+      - JWT_DAY=${JWT_DAY}
+      - HASHING_ALGORITHM=${HASHING_ALGORITHM}
+      - AUTHENTICATION_ROUTER=${AUTHENTICATION_ROUTER}
+    volumes:
+      - ./account/:/usr/account/
+    expose:
+      - ${AUTHENTICATION_PORT}
+    ports:
+      - ${AUTHENTICATION_PORT_EXT}:${AUTHENTICATION_PORT}
+    depends_on:
+      - account-db
+
+  redis-backend-celery:
+    container_name: redis-backend-celery
+    hostname: ${REDIS_HOSTNAME}
+    image: redis:7
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+
+  rabbitmq-broker-celery:
+    image: "rabbitmq:3-management"
+    container_name: rabbitmq-broker-celery
+    hostname: ${RABBITMQ_HOST}
+    ports:
+      - ${RABBITMQ_PORT_AMQP}:${RABBITMQ_PORT_AMQP}
+      - ${RABBITMQ_PORT_HTTP}:${RABBITMQ_PORT_HTTP}
+
+  celery-worker:
+    container_name: celery-worker
+    restart: always
+    build:
+      dockerfile: Dockerfile.Celery
+      context: ./order/
+    image:
+      ecommerce-microservices_celery-worker:latest
+    command: celery -A src.celery_worker worker --loglevel=info
+    volumes:
+      - ./order/:/usr/order/
+    environment:
+      - RABBITMQ_HOST=${RABBITMQ_HOST}
+      - RABBITMQ_PORT_AMQP=${RABBITMQ_PORT_AMQP}
+      - REDIS_HOSTNAME=${REDIS_HOSTNAME}
+      - REDIS_PORT=${REDIS_PORT}
+    depends_on:
+      - order
+      - redis-backend-celery
+      - rabbitmq-broker-celery
+
+  flower:
+    container_name: flower
+    image: mher/flower
+    command: celery --broker=amqp://${RABBITMQ_HOST}:${RABBITMQ_PORT_AMQP} flower --port=${FLOWER_PORT}
+    ports:
+      - ${FLOWER_PORT}:${FLOWER_PORT}
+    depends_on:
+      - celery-worker
+      - rabbitmq-broker-celery
+
+volumes:
+  postgresql_product_db_data:
+  postgresql_order_db_data:
+  postgresql_account_db_data:

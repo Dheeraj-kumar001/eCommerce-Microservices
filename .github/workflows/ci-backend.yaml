@@ -1,0 +1,149 @@
+name: "CI eCommerce-Microservices IBC"
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "feature/**"
+      - "fix/**"
+      - "main"
+env:
+  # Setting an environment variable with the value of a configuration variable
+  ENVIRONMENT: ${{ vars.ENVIRONMENT }}
+
+  # Common microservice config
+  EXT_HOST: ${{ vars.EXT_HOST }}
+
+  # Product microservice
+  PRODUCT_HOST: ${{ vars.PRODUCT_HOST }}
+  PRODUCT_PORT: ${{ vars.PRODUCT_PORT }}
+  PRODUCT_PORT_EXT: ${{ vars.PRODUCT_PORT_EXT }}
+  PRODUCT_WORKERS: ${{ vars.PRODUCT_WORKERS }}
+
+  # Account microservice
+  AUTHENTICATION_HOST: ${{ vars.AUTHENTICATION_HOST }}
+  AUTHENTICATION_PORT: ${{ vars.AUTHENTICATION_PORT }}
+  AUTHENTICATION_PORT_EXT: ${{ vars.AUTHENTICATION_PORT_EXT }}
+  AUTHENTICATION_WORKERS: ${{ vars.AUTHENTICATION_WORKERS }}
+
+  # Order microservice
+  ORDER_HOST: ${{ vars.ORDER_HOST }}
+  ORDER_PORT: ${{ vars.ORDER_PORT }}
+  ORDER_PORT_EXT: ${{ vars.ORDER_PORT_EXT }}
+  ORDER_WORKERS: ${{ vars.ORDER_WORKERS }}
+
+  # Database - Postgres
+  POSTGRES_DB_PRODUCT: ${{ vars.POSTGRES_DB_PRODUCT }}
+  POSTGRES_DB_ORDER: ${{ vars.POSTGRES_DB_ORDER }}
+  POSTGRES_DB_ACCOUNT: ${{ vars.POSTGRES_DB_ACCOUNT }}
+
+  # This is the host for Docker Postgres Image in docker-compose.yaml
+  POSTGRES_HOST_PRODUCT: ${{ vars.POSTGRES_HOST_PRODUCT }}
+  POSTGRES_HOST_ORDER: ${{ vars.POSTGRES_HOST_ORDER }}
+  POSTGRES_HOST_ACCOUNT: ${{ vars.POSTGRES_HOST_ACCOUNT }}
+
+  # Postgres Ports
+  POSTGRES_PORT_PRODUCT: ${{ vars.POSTGRES_PORT_PRODUCT }}
+  POSTGRES_PORT_PRODUCT_EXT: ${{ vars.POSTGRES_PORT_PRODUCT_EXT }}
+  POSTGRES_PORT_ACCOUNT: ${{ vars.POSTGRES_PORT_ACCOUNT }}
+  POSTGRES_PORT_ACCOUNT_EXT: ${{ vars.POSTGRES_PORT_ACCOUNT_EXT }}
+  POSTGRES_PORT_ORDER: ${{ vars.POSTGRES_PORT_ORDER }}
+  POSTGRES_PORT_ORDER_EXT: ${{ vars.POSTGRES_PORT_ORDER_EXT }}
+
+  # Flower port
+  FLOWER_PORT: ${{ vars.FLOWER_PORT }}
+
+  # RabbitMQ
+  RABBITMQ_HOST: ${{ vars.RABBITMQ_HOST }}
+  RABBITMQ_PORT_AMQP: ${{ vars.RABBITMQ_PORT_AMQP }}
+  RABBITMQ_PORT_HTTP: ${{ vars.RABBITMQ_PORT_HTTP }}
+
+  # Redis
+  REDIS_HOSTNAME: ${{ vars.REDIS_HOSTNAME }}
+  REDIS_PORT: ${{ vars.REDIS_PORT }}
+
+  # Common postgres config
+  POSTGRES_PASSWORD: ${{ vars.POSTGRES_PASSWORD }}
+  POSTGRES_SCHEMA: ${{ vars.POSTGRES_SCHEMA }}
+  POSTGRES_USERNAME: ${{ vars.POSTGRES_USERNAME }}
+  IS_ALLOWED_CREDENTIALS: ${{ vars.IS_ALLOWED_CREDENTIALS }}
+  API_TOKEN: ${{ vars.API_TOKEN }}
+  AUTH_TOKEN: ${{ vars.AUTH_TOKEN }}
+
+  # Database - SQLAlchemy
+  DB_TIMEOUT: ${{ vars.DB_TIMEOUT }}
+  DB_POOL_SIZE: ${{ vars.DB_POOL_SIZE }}
+  DB_MAX_POOL_CON: ${{ vars.DB_MAX_POOL_CON }}
+  DB_POOL_OVERFLOW: ${{ vars.DB_POOL_OVERFLOW }}
+  IS_DB_ECHO_LOG: ${{ vars.IS_DB_ECHO_LOG }}
+  IS_DB_EXPIRE_ON_COMMIT: ${{ vars.IS_DB_EXPIRE_ON_COMMIT }}
+  IS_DB_FORCE_ROLLBACK: ${{ vars.IS_DB_FORCE_ROLLBACK }}
+
+  # JWT Token
+  JWT_SECRET_KEY: ${{ vars.JWT_SECRET_KEY }}
+  JWT_ALGORITHM: ${{ vars.JWT_ALGORITHM }}
+  JWT_MIN: ${{ vars.JWT_MIN }}
+  JWT_HOUR: ${{ vars.JWT_HOUR }}
+  JWT_DAY: ${{ vars.JWT_DAY }}
+
+  # Hash Functions
+  HASHING_ALGORITHM: ${{ vars.HASHING_ALGORITHM }}
+
+  # Authentication endpoint
+  AUTHENTICATION_ROUTER: ${{ vars.AUTHENTICATION_ROUTER }}
+  AUTHENTICATION_ENDPOINT: ${{ vars.AUTHENTICATION_ENDPOINT }}
+
+jobs:
+  code_format:
+    name: "Code Format 🎨"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r order/requirements.txt
+      - name: Run black
+        run: |
+          black . --check --config=pyproject.toml
+      - name: Run ruff
+        run: |
+          python -m pip install ruff
+          ruff check --config=pyproject.toml
+  test:
+    name: "Test 🧪"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Test Product
+        uses: adambirds/docker-compose-action@v1.3.0
+        with:
+          compose-file: "./docker-compose.yaml"
+          services: |
+            product-db
+            product
+          test-container: product
+          test-command: "pytest"
+      - name: Test Order
+        uses: adambirds/docker-compose-action@v1.3.0
+        with:
+          compose-file: "./docker-compose.yaml"
+          services: |
+            order-db
+            order
+          test-container: order
+          test-command: "pytest"
+      - name: Test Account
+        uses: adambirds/docker-compose-action@v1.3.0
+        with:
+          compose-file: "./docker-compose.yaml"
+          services: |
+            account-db
+            account
+          test-container: account
+          test-command: "pytest"
