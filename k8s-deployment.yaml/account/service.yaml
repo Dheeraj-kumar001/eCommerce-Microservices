@@ -1,0 +1,38 @@
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yaml -o k8s_deployment.yml
+    kompose.image-pull-policy: Never
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: account
+  name: account
+spec:
+  type: LoadBalancer
+  ports:
+    - name: "8003"
+      port: 8003
+      targetPort: 8002
+
+  selector:
+    io.kompose.service: account
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yaml -o k8s_deployment.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: account-db
+  name: account-db
+spec:
+  type: ClusterIP
+  ports:
+    - name: "5435"
+      port: 5435
+      targetPort: 5434
+
+  selector:
+    io.kompose.service: account-db
