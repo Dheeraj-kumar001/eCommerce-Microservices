@@ -1,0 +1,113 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yaml -o k8s_deployment.yml
+    kompose.image-pull-policy: Never
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: account
+  name: account
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: account
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yaml -o k8s_deployment.yml
+        kompose.image-pull-policy: Never
+        kompose.version: 1.32.0 (765fde254)
+      labels:
+        io.kompose.network/ecommerce-microservices-default: "true"
+        io.kompose.service: account
+    spec:
+      containers:
+        - envFrom:
+            - configMapRef:
+                name: account-config
+            - secretRef:
+                name: account-secret
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
+          image: dheerukiregistry.azurecr.io/ecommerce-microservices_account:latest
+          imagePullPolicy: Always
+          name: account
+          ports:
+            - containerPort: 8002
+              protocol: TCP
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yaml -o k8s_deployment.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: account-db
+  name: account-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: account-db
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yaml -o k8s_deployment.yml
+        kompose.version: 1.32.0 (765fde254)
+      labels:
+        io.kompose.network/ecommerce-microservices-default: "true"
+        io.kompose.service: account-db
+    spec:
+      containers:
+        - args:
+            - -p
+            - "5434"
+          env:
+            - name: PGDATA
+              value: /var/lib/postgresql/pgdata
+            - name: POSTGRES_DB
+              value: postgres_account
+            - name: POSTGRES_PASSWORD
+              value: mysecurepassword
+            - name: POSTGRES_USER
+              value: postgres
+          image: postgres:latest
+          name: account-db
+          ports:
+            - containerPort: 5434
+              hostPort: 5435
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgresql-account-db-data
+      restartPolicy: Always
+      volumes:
+        - name: postgresql-account-db-data
+          persistentVolumeClaim:
+            claimName: postgresql-account-db-data
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    io.kompose.service: postgresql-account-db-data
+  name: postgresql-account-db-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Mi
