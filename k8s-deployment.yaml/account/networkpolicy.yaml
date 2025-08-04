@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-account-to-db
+  namespace: ecommerce
+spec:
+  podSelector:
+    matchLabels:
+      io.kompose.service: account-db
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              io.kompose.service: account
