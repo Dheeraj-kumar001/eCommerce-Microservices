@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yaml -o k8s_deployment.yml
+    kompose.image-pull-policy: Never
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: product
+  name: product
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: product
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yaml -o k8s_deployment.yml
+        kompose.image-pull-policy: Never
+        kompose.version: 1.32.0 (765fde254)
+      labels:
+        io.kompose.network/ecommerce-microservices-default: "true"
+        io.kompose.service: product
+    spec:
+      containers:
+        - envFrom:
+            - configMapRef:
+                name: product-config
+            - secretRef:
+                name: product-secret
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"
+          image: dheerukiregistry.azurecr.io/ecommerce-microservices_product:latest
+          imagePullPolicy: Always
+          name: product
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+      restartPolicy: Always
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yaml -o k8s_deployment.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: product-db
+  name: product-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: product-db
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yaml -o k8s_deployment.yml
+        kompose.version: 1.32.0 (765fde254)
+      labels:
+        io.kompose.network/ecommerce-microservices-default: "true"
+        io.kompose.service: product-db
+    spec:
+      containers:
+        - env:
+            - name: POSTGRES_DB
+              value: postgres_product
+            - name: POSTGRES_PASSWORD
+              value: mysecurepassword
+            - name: POSTGRES_USER
+              value: postgres
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          image: postgres:latest
+          name: product-db
+          ports:
+            - containerPort: 5432
+              hostPort: 5433
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgresql-product-db-data
+      restartPolicy: Always
+      volumes:
+        - name: postgresql-product-db-data
+          persistentVolumeClaim:
+            claimName: postgresql-product-db-data
