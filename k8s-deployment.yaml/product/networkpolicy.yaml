@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: allow-product-to-db
+  namespace: default
+
+spec:
+  podSelector:
+    matchLabels:
+      io.kompose.service: product-db
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+       - podSelector:
+           matchLabels:
+             io.kompose.service: product
