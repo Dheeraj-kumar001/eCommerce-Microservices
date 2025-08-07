@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.yaml -o k8s_deployment.yml
+    kompose.version: 1.32.0 (765fde254)
+  labels:
+    io.kompose.service: redis-backend-celery
+  name: redis-backend-celery
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: redis-backend-celery
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose.yaml -o k8s_deployment.yml
+        kompose.version: 1.32.0 (765fde254)
+      labels:
+        io.kompose.network/ecommerce-microservices-default: "true"
+        io.kompose.service: redis-backend-celery
+    spec:
+      containers:
+        - image: redis:7
+          name: redis-backend-celery
+          ports:
+            - containerPort: 6379
+              hostPort: 6379
+              protocol: TCP
+      hostname: redis-backend-celery
+      restartPolicy: Always
+ 
