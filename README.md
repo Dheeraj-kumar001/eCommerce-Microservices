@@ -57,9 +57,12 @@ The project uses the following tech-stack:
 * 🔐 [Acr](https://learn.microsoft.com/en-us/azure/container-registry/)
 * 🤖 [Terraform](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs)
 * 📡 [Azure Monitor](https://docs.azure.cn/en-us/azure-monitor/fundamentals/getting-started)
-*     [Jenkins](https://www.jenkins.io/doc/)
+* 🧩 [Jenkins](https://www.jenkins.io/doc/)
 * 📦 [Helmchart](https://helm.sh/docs/)
-*    [Prometheous](https://prometheus.io/docs/introduction/overview/)
+* 📊 [Prometheous](https://prometheus.io/docs/introduction/overview/)
+* 🔍 [Trivy](https://www.aquasec.com/products/trivy/)
+* 🛡️ [Owasp](https://owasp.org/www-project-dependency-check/)
+* 🏗️ [Sonarqube](https://docs.sonarsource.com/sonarqube-server/latest/)
 
 **Complementary**
 * [TOML](https://toml.io/en/) $\rightarrow$ The one-for-all configuration file. This makes it simpler to setup our project.
