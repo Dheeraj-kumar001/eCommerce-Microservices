@@ -1,4 +1,8 @@
-# eCommerce-Microservices IBC
+## eCommerce-Microservices IBC
+
+📌 **Originally Developed By**: [Original Author's Name](https://github.com/ibasa14/eCommerce-Microservices.git)  
+🚀 **Enhanced DevOps Implementation By**: [Your Name](https://github.com/Dheeraj-kumar001/eCommerce-Microservices.git)  
+📅 **Last Updated**: August 2025  
 
 This project serves as a way to use and practice with some of the most popular tech stack for backend development using Python.
 
@@ -14,6 +18,31 @@ The project emulates a real-world application of an e-commerce following the mic
 - [Deployment](#deployment)
 - [License](#license)
 
+## Credit
+- **Originally Developed By**: [Original Author's Name](https://github.com/ibasa14/eCommerce-Microservices.git)  
+  - only include dockerfile, basic kuberentes and basic FastAPI setup.
+
+- **My Enhancements**:  
+  - Implemented **complete DevOps pipeline** (CI/CD, Security Scanning, Monitoring).  
+  - Added **Kubernetes (AKS) Infrastructure as Code** using Terraform. 
+  - pull the image  **azure container registry** and host azure container app 
+  - Integrated **Trivy, OWASP, SonarQube** for security.  
+  - Deployed **Prometheus+Grafana, ELK Stack** for observability. 
+  - deployed **Helm Chart**
+
+## Project Overview
+### Original Work  
+- Basic eCommerce microservices with Docker + FastAPI.  
+- Limited to local development setup.  
+
+## My Contributions  
+![DevOps Architecture](screenshots/my-devops-architecture.png)  
+- **End-to-End DevOps Implementation**:  
+  - CI/CD: GitHub Actions → ACR → AKS  
+  - Security: Trivy, OWASP, SonarQube  
+  - Monitoring: Azure Monitor + Prometheus/Grafana  
+  - Logging: ELK Stack (Kibana)  
+
 ## Stack
 The project uses the following tech-stack:
 
@@ -22,7 +51,15 @@ The project uses the following tech-stack:
 * 🐘 [Asynchronous PostgreSQL](https://www.postgresql.org/docs/current/libpq-async.html)
 * 🐍 [FastAPI](https://fastapi.tiangolo.com/)
 * 🥦 [Celery](https://docs.celeryq.dev/en/stable/)
-* ☸ [Kubernetes](https://kubernetes.io/es/docs/concepts/overview/what-is-kubernetes/)
+* 🐇 [Rabbitmq](https://www.rabbitmq.com/docs)
+* ☸  [Kubernetes](https://kubernetes.io/es/docs/concepts/overview/what-is-kubernetes/)
+* 🏢 [Aks Cluster](https://learn.microsoft.com/en-us/azure/aks/)
+* 🔐 [Acr](https://learn.microsoft.com/en-us/azure/container-registry/)
+* 🤖 [Terraform](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs)
+* 📡 [Azure Monitor](https://docs.azure.cn/en-us/azure-monitor/fundamentals/getting-started)
+*     [Jenkins](https://www.jenkins.io/doc/)
+* 📦 [Helmchart](https://helm.sh/docs/)
+*    [Prometheous](https://prometheus.io/docs/introduction/overview/)
 
 **Complementary**
 * [TOML](https://toml.io/en/) $\rightarrow$ The one-for-all configuration file. This makes it simpler to setup our project.
@@ -135,6 +172,9 @@ sudo apt install kubectl
 ```
 
 
-## License
-MIT License.
-Please refer to the LICENSE file.
+
+## 📜 License  
+ **Original Microservices Code**  
+   📄 [MIT License](LICENSE)  
+   © 2023 Ignacio Basagoiti  
+   [Source Repository](https://github.com/ibasa14/eCommerce-Microservices.git)
