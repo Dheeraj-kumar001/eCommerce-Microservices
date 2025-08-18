@@ -1,0 +1,97 @@
+ @Library('shared-Lib') _
+pipeline {
+    agent any
+
+    environment {
+        SONAR_HOME = tool "sonar"
+        DOCKER_REGISTRY_DH = "dock2o"
+        DOCKER_REGISTRY_ACR = "dheerajregistry.azurecr.io"
+        DOCKER_TAG = "latest"
+        
+    }
+
+   
+
+    stages {
+
+        stage("Workspace cleanup") {
+            steps {
+                script {
+                    cleanWs()
+                }
+            }
+        }
+
+        stage('Git: Code Checkout') {
+            steps {
+                script {
+                    code_checkout("https://github.com/Dheeraj-kumar001/eCommerce-Microservices.git", "main")
+                }
+            }
+        }
+
+        stage("SonarQube Quality Analysis") {
+            steps {
+                withSonarQubeEnv("sonar") {
+                    sh "${SONAR_HOME}/bin/sonar-scanner -Dsonar.projectName=ecommerce-microservice -Dsonar.projectKey=ecommerce-microservice"
+                }
+            }
+        }
+
+        stage("OWASP Dependency check") {
+            steps {
+                script {
+                    owasp_dependency("dc")
+                }
+            }
+        }
+
+        stage("Sonar Quality gate Scan") {
+            steps {
+                script {
+                    sonarqube_code_quality()
+                }
+            }
+        }
+
+        stage("Trivy File System Scan") {
+            steps {
+                script {
+                    trivy_scan()
+                }
+            }
+        }
+
+         
+        stage("Docker: Build Images") {
+          steps {
+            script {
+              // yaha apne services list karo
+              def services = [
+                  [name: "account", path: "account", dockerfile: "Dockerfile"],
+                  [name: "order", path: "order", dockerfile: "Dockerfile"],
+                  [name: "product", path: "product", dockerfile: "Dockerfile"],
+                  
+                  
+            ]
+
+            // dynamically parallel stages create karo
+            def parallelStages = services.collectEntries { service ->
+                ["${service.name}" : {
+                    dir(service.path) {
+                        sh "docker build -t ${service.name}:latest ."
+                    }
+                }]
+            }
+
+            parallel parallelStages
+        }
+    }
+}
+
+
+
+    }
+}
+        
+                       
