@@ -37,6 +37,27 @@ The project emulates a real-world application of an e-commerce following the mic
 
 ## My Contributions  
 ![DevOps Architecture](screenshots/my-devops-architecture.png)  
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/03de7d54-c1d1-43da-97bf-7fb57d4f98c4" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/881465ee-3e5a-41da-b048-9b61e0d2635b" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/b279be46-b82c-48cb-8114-86fc6f3ec54a" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/90fb72c6-31d6-4e05-92c7-a328ba43b20e" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/057c503e-3069-4b0c-b4a0-56b564494c92" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/3e38ae61-9496-4bb1-898c-49f2aa809e69" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/a1743721-6604-47ed-8b28-e38ac5e375cb" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/13cdc521-3daa-40b3-aa14-c00e8842d3e8" /> 
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/e6322e6d-0a26-4b27-84da-5e3d13efd01b" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/acc0294f-9878-4ffa-ab0c-45c5a8ea890a" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/a5eddf9a-9cf0-4080-8987-ff832f46d471" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/5b2c97d3-6cad-44b1-b813-97b5c29b0b13" />
+
+
+
+
+
+
+
+
+
 - **End-to-End DevOps Implementation**:  
   - CI/CD: GitHub Actions → ACR → AKS  
   - Security: Trivy, OWASP, SonarQube  
